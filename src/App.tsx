@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { MOCK, useQuery } from "./api";
 import { getLang, setLang, t, useLang } from "./i18n";
 import { back, nav, setTab, type Route, type Tab } from "./store";
-import { haptic, setBack, tgUser } from "./tg";
+import { haptic, setBack, startParam, tgUser } from "./tg";
+import { go } from "./store";
 import { ErrorBox, Icon, Shield } from "./ui";
 import Onboarding from "./screens/Onboarding";
 import Today from "./screens/Today";
@@ -28,6 +29,15 @@ export default function App() {
   useEffect(() => {
     if (me?.user?.lang && !localStorage.getItem("sp_lang") && me.user.lang !== getLang()) setLang(me.user.lang);
   }, [me?.user?.lang]);
+
+  // Deep links from the bot: startapp=program_<slug>
+  useEffect(() => {
+    if (me?.profile?.onboarding_done_at && startParam?.startsWith("program_") && !sessionStorage.getItem("sp_deeplink")) {
+      sessionStorage.setItem("sp_deeplink", "1");
+      setTab("train");
+      go({ name: "program", slug: startParam.slice(8) });
+    }
+  }, [me?.profile?.onboarding_done_at]);
 
   useEffect(() => {
     setBack(stack.length ? () => back() : null);

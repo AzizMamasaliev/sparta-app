@@ -308,7 +308,7 @@ route("GET", "/foods/search", ({ query }) => {
   return foods.filter((f) => f.name_uz.toLowerCase().includes(q) || f.name_ru.toLowerCase().includes(q));
 });
 route("POST", "/food-logs", ({ body }) => {
-  if (!premium()) throw new ApiError(402, "premium_required");
+  if (!premium() && st.food.filter((f) => f.logged_on === today()).length >= 3) throw new ApiError(402, "free_limit");
   const food = foods.find((f) => f.id === body.food_id)!;
   const portion = food.portions.find((p: Any) => p.key === body.portion_key) ?? food.portions[0];
   const grams = body.grams ?? portion.g * (body.qty ?? 1);

@@ -188,6 +188,8 @@ const D = {
   add: ["Qoʻshish", "Добавить"],
   portion: ["Porsiya", "Порция"],
   qty: ["Miqdor", "Количество"],
+  food_free: ["Bepul: bugungi yozuvlar", "Бесплатно: записей сегодня"],
+  food_free_d: ["Premium’da — cheksiz kundalik va haftalik tahlil", "В Premium — без ограничений и с разбором недели"],
   food_locked: ["Ovqat kundaligi — Premium imkoniyati", "Дневник питания — функция Premium"],
   food_locked_d: ["Bepul versiyada kunlik meʼyoringiz va suv hisobi mavjud", "В бесплатной версии доступны Ваша норма и учёт воды"],
   empty_meal: ["Hali hech narsa yoʻq", "Пока пусто"],

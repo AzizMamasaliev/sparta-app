@@ -6,6 +6,7 @@ import { haptic } from "../tg";
 import { Bar, ErrorBox, Icon, Loading, Ring, Section, Sheet, Stepper } from "../ui";
 
 const MEALS = ["breakfast", "lunch", "dinner", "snack"] as const;
+const FREE_LIMIT = 3;
 const defaultMeal = () => {
   const h = new Date().getHours();
   return h < 11 ? "breakfast" : h < 16 ? "lunch" : h < 21 ? "dinner" : "snack";
@@ -69,14 +70,17 @@ export default function Food({ premium }: { premium: boolean }) {
         <button className="chip" onClick={() => water(500)}>+500</button>
       </div>
 
-      {!premium ? (
-        <div className="card mt16 center col" style={{ alignItems: "center", gap: 10, padding: 24 }}>
-          <div style={{ fontSize: 40 }}>🍲</div>
-          <h3>{t("food_locked")}</h3>
-          <p className="small muted">{t("food_locked_d")}</p>
-          <button className="btn gold mt8" onClick={() => go({ name: "paywall", from: "food" })}>{t("pw_trial")}</button>
+      {!premium && (
+        <div className="card tight mt16 row" style={{ borderColor: "rgba(217,168,91,.3)" }}>
+          <span style={{ fontSize: 22 }}>🍲</span>
+          <div className="grow">
+            <b className="small">{t("food_free")} {Math.min(logs.length, FREE_LIMIT)}/{FREE_LIMIT}</b>
+            <div className="xs muted">{t("food_free_d")}</div>
+          </div>
+          <button className="btn gold sm" onClick={() => go({ name: "paywall", from: "food" })}>Premium</button>
         </div>
-      ) : (
+      )}
+      {(
         <>
           <div className="mt16" style={{ position: "relative" }}>
             <Icon name="search" size={18} style={{ position: "absolute", left: 14, top: 14, color: "var(--tx3)" }} />
