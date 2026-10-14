@@ -207,6 +207,16 @@ const D = {
 
   // profile
   my_plan: ["Mening rejam", "Мой план"],
+  your_name: ["Ismingiz", "Ваше имя"],
+  plan_fact: ["Reja / Fakt", "План / Факт"],
+  pf_plan: ["Reja", "План"],
+  pf_done: ["Bajarildi", "Сделано"],
+  pf_left: ["Qoldi", "Осталось"],
+  pf_workouts_week: ["Hafta mashqlari", "Тренировки/нед."],
+  pf_program: ["Dastur kunlari", "Дни программы"],
+  pf_kcal: ["Kaloriya (bugun)", "Калории (сегодня)"],
+  pf_protein: ["Oqsil (bugun)", "Белок (сегодня)"],
+  pf_water: ["Suv (bugun), ml", "Вода (сегодня), мл"],
   edit_profile: ["Anketani oʻzgartirish", "Изменить анкету"],
   language: ["Til", "Язык"],
   reminders: ["Eslatmalar", "Напоминания"],

@@ -360,6 +360,7 @@ route("POST", "/squads", ({ body }) => {
   st.squads.push(sq);
   return { squad: sq, invite_link: `https://t.me/Spartafit_bot?start=sq_${sq.invite_code}` };
 });
+route("PATCH", "/ext/name", ({ body }) => (st.profile && (st.profile.display_name = body.display_name), { ok: true }));
 route("POST", "/settings/notify", () => ({ ok: true }));
 
 export async function mockApi(method: string, path: string, body: unknown) {

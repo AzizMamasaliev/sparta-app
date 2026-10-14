@@ -38,3 +38,6 @@ export const MUSCLE_EMOJI: Record<string, string> = {
   chest: "🛡", back: "🦅", shoulders: "⛰", biceps: "💪", triceps: "🔱", forearms: "✊", traps: "🔺",
   abs: "🧱", obliques: "🌀", glutes: "🍑", quads: "🦵", hamstrings: "🏹", calves: "⚡",
 };
+
+/** Name shown in the app: user-chosen display name, else Telegram first name. */
+export const displayName = (me: any) => me?.profile?.display_name || me?.user?.first_name || "";

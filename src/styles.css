@@ -147,3 +147,4 @@ p { margin: 0; }
 ol.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 10px; }
 ol.steps li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; }
 ol.steps li::before { content: counter(s); flex: none; width: 26px; height: 26px; border-radius: 8px; background: rgba(217,168,91,.14); color: var(--gold2); font-weight: 800; font-size: 13px; display: grid; place-items: center; }
+.wrap { display: flex; flex-wrap: wrap; gap: 8px; }

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { api, ApiError, invalidate, MOCK, useQuery } from "../api";
+import { api, apiExt, ApiError, invalidate, MOCK, useQuery } from "../api";
 import { fmt, setLang, t, useLang, type Key } from "../i18n";
-import { rankInfo } from "../lib";
+import { displayName, rankInfo } from "../lib";
 import { back, go, toast } from "../store";
 import { haptic, openInvoice, openTgLink, shareText, tgUser } from "../tg";
-import { Bar, Icon, Section, Sheet, Stepper, TopBar } from "../ui";
+import { Bar, Icon, Section, Sheet, Shield, Stepper, TopBar } from "../ui";
 
 const BOT = "Spartafit_bot";
 
@@ -33,10 +33,10 @@ export default function Profile({ me }: { me: any }) {
     <div className="screen">
       <div className="card hero row gap16">
         <div className="thumb" style={{ width: 64, height: 64, borderRadius: 20, fontSize: 28 }}>
-          {photo ? <img src={photo} alt="" width={64} height={64} /> : "🛡"}
+          {photo ? <img src={photo} alt="" width={64} height={64} /> : <Shield size={52} />}
         </div>
         <div className="grow">
-          <h2 className="ellipsis">{me?.user?.first_name ?? "Spartan"}</h2>
+          <h2 className="ellipsis">{displayName(me) || "Spartan"}</h2>
           <div className="small gold">{t(rk.key)} · {fmt(st.xp ?? 0)} XP</div>
           <div className="mt8"><Bar value={rk.pct * 100} max={100} /></div>
         </div>
@@ -217,6 +217,7 @@ export function EditProfile() {
   useLang();
   const me = useQuery<any>("/me").data;
   const p = me?.profile;
+  const [name, setName] = useState<string>(displayName(me));
   const [w, setW] = useState<number>(Number(p?.weight_kg ?? 70));
   const [goal, setGoal] = useState<string>(p?.goal ?? "tone");
   const [days, setDays] = useState<number>(p?.days_per_week ?? 3);
@@ -226,6 +227,7 @@ export function EditProfile() {
     setBusy(true);
     try {
       await api("PATCH", "/profile", { weight_kg: w, goal, days_per_week: days, place });
+      if (name.trim() && name.trim() !== displayName(me)) await apiExt("PATCH", "/name", { display_name: name.trim() });
       haptic.ok();
       invalidate("/");
       toast("✅ " + t("save"));
@@ -239,13 +241,14 @@ export function EditProfile() {
   return (
     <div className="screen full">
       <TopBar title={t("edit_profile")} />
-      <div className="field"><label>{t("weight")}</label><Stepper value={w} step={0.5} min={35} max={250} unit={t("kg")} onChange={setW} /></div>
+      <div className="field"><label>{t("your_name")}</label><input className="input" style={{ fontSize: 17 }} maxLength={40} value={name} onChange={(e) => setName(e.target.value)} /></div>
+      <div className="field mt16"><label>{t("weight")}</label><Stepper value={w} step={0.5} min={35} max={250} unit={t("kg")} onChange={setW} /></div>
       <div className="caps mt24">{t("goal")}</div>
-      <div className="chips mt8">{["lose", "tone", "gain", "strength", "health"].map((g) => <button key={g} className={"chip" + (goal === g ? " on" : "")} onClick={() => setGoal(g)}>{t(`goal_${g}` as Key)}</button>)}</div>
+      <div className="wrap mt8">{["lose", "tone", "gain", "strength", "health"].map((g) => <button key={g} className={"chip" + (goal === g ? " on" : "")} onClick={() => setGoal(g)}>{t(`goal_${g}` as Key)}</button>)}</div>
       <div className="caps mt24">{t("place")}</div>
-      <div className="chips mt8">{["home", "outdoor", "gym", "any"].map((g) => <button key={g} className={"chip" + (place === g ? " on" : "")} onClick={() => setPlace(g)}>{t(`place_${g}` as Key)}</button>)}</div>
+      <div className="wrap mt8">{["home", "outdoor", "gym", "any"].map((g) => <button key={g} className={"chip" + (place === g ? " on" : "")} onClick={() => setPlace(g)}>{t(`place_${g}` as Key)}</button>)}</div>
       <div className="caps mt24">{t("ob_days")}</div>
-      <div className="chips mt8">{[2, 3, 4, 5, 6].map((n) => <button key={n} className={"chip" + (days === n ? " on" : "")} onClick={() => setDays(n)}>{n}</button>)}</div>
+      <div className="wrap mt8">{[2, 3, 4, 5, 6].map((n) => <button key={n} className={"chip" + (days === n ? " on" : "")} onClick={() => setDays(n)}>{n}</button>)}</div>
       <div className="bottom-cta"><button className="btn gold" disabled={busy} onClick={save}>{t("save")}</button></div>
     </div>
   );

@@ -1,10 +1,30 @@
 import { initData, inTelegram } from "./tg";
 
+type Method = "GET" | "POST" | "PATCH" | "DELETE";
+
 export const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ??
   "https://sofubxliyaorrordvssz.supabase.co/functions/v1/api";
 
 /** Browser preview (outside Telegram) or ?mock=1 → in-memory demo backend. */
 export const MOCK = !inTelegram || new URLSearchParams(location.search).has("mock");
+
+export const EXT_URL = API_URL.replace(/\/api$/, "/ext");
+
+/** Companion endpoints (supabase/functions/ext). */
+export async function apiExt<T = any>(method: Method, path: string, body?: unknown): Promise<T> {
+  if (MOCK) {
+    const { mockApi } = await import("./mock/mock");
+    return mockApi(method, "/ext" + path, body) as Promise<T>;
+  }
+  const res = await fetch(EXT_URL + path, {
+    method,
+    headers: { "content-type": "application/json", "x-telegram-init-data": initData },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ApiError(res.status, data.error ?? "http_" + res.status);
+  return data as T;
+}
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string) {
@@ -12,7 +32,6 @@ export class ApiError extends Error {
   }
 }
 
-type Method = "GET" | "POST" | "PATCH" | "DELETE";
 
 export async function api<T = any>(method: Method, path: string, body?: unknown): Promise<T> {
   if (MOCK) {

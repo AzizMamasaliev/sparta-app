@@ -1,7 +1,7 @@
 import { api, invalidate, useQuery } from "../api";
 import { BodyFigure, heatColor } from "../BodyMap";
 import { fmt, L, t, useLang } from "../i18n";
-import { dayToItems, dose, rankInfo } from "../lib";
+import { dayToItems, displayName, dose, rankInfo } from "../lib";
 import { go, setTab } from "../store";
 import { haptic } from "../tg";
 import { Bar, ErrorBox, Icon, Loading, Ring, Section } from "../ui";
@@ -9,7 +9,7 @@ import { Bar, ErrorBox, Icon, Loading, Ring, Section } from "../ui";
 export default function Today({ me }: { me: any }) {
   useLang();
   const { data, error, loading, refetch } = useQuery<any>("/today", 15_000);
-  const name = me?.user?.first_name ?? "";
+  const name = displayName(me);
   if (loading && !data) return <div className="screen"><Loading /></div>;
   if (error && !data) return <div className="screen"><ErrorBox onRetry={refetch} /></div>;
   if (!data) return null;
@@ -81,6 +81,8 @@ export default function Today({ me }: { me: any }) {
         )}
       </Section>
 
+      <PlanFact me={me} today={data} />
+
       <Section title={t("recovery")}>
         <div className="card">
           <div className="row" style={{ justifyContent: "space-around" }}>
@@ -113,5 +115,55 @@ export default function Today({ me }: { me: any }) {
         ) : <div className="card muted">{t("no_data")}</div>}
       </Section>
     </div>
+  );
+}
+
+/** Plan vs fact: what was planned, what is done, what is left. */
+function PlanFact({ me, today }: { me: any; today: any }) {
+  const progress = useQuery<any>("/progress", 60_000).data;
+  const n = today.nutrition;
+  const dpw = Number(me?.profile?.days_per_week ?? 3);
+  const now = new Date(Date.now() + 5 * 36e5);
+  const monday = new Date(now);
+  monday.setUTCDate(now.getUTCDate() - ((now.getUTCDay() + 6) % 7));
+  const weekStart = monday.toISOString().slice(0, 10);
+  const weekDone = (progress?.workouts ?? []).filter((w: any) => new Date(new Date(w.started_at).getTime() + 5 * 36e5).toISOString().slice(0, 10) >= weekStart).length;
+  const ap = me?.active_program;
+  const rows: [string, number, number][] = [[t("pf_workouts_week"), dpw, weekDone]];
+  if (ap?.programs) {
+    const total = ap.programs.weeks * ap.programs.days_per_week;
+    rows.push([t("pf_program"), total, (ap.current_week - 1) * ap.programs.days_per_week + ap.current_day - 1]);
+  }
+  if (n?.targets) {
+    rows.push([t("pf_kcal"), n.targets.kcal_target, Math.round(n.eaten.kcal)]);
+    rows.push([t("pf_protein"), n.targets.protein_g, Math.round(n.eaten.protein_g)]);
+    rows.push([t("pf_water"), n.targets.water_ml, n.water_ml]);
+  }
+  return (
+    <Section title={t("plan_fact")}>
+      <div className="card" style={{ padding: "8px 14px" }}>
+        <div className="row xs dim" style={{ padding: "6px 0" }}>
+          <span className="grow" />
+          <span style={{ width: 58, textAlign: "right" }}>{t("pf_plan")}</span>
+          <span style={{ width: 58, textAlign: "right" }}>{t("pf_done")}</span>
+          <span style={{ width: 58, textAlign: "right" }}>{t("pf_left")}</span>
+        </div>
+        {rows.map(([label, plan, done]) => {
+          const left = Math.max(0, plan - done);
+          const over = done > plan;
+          return (
+            <div key={label} style={{ padding: "8px 0", borderTop: "1px solid var(--line)" }}>
+              <div className="row small" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <span className="grow ellipsis">{label}</span>
+                <span style={{ width: 58, textAlign: "right" }} className="muted">{fmt(plan)}</span>
+                <b style={{ width: 58, textAlign: "right" }} className={over ? "" : "gold"}>{fmt(done)}</b>
+                <span style={{ width: 58, textAlign: "right", color: over ? "#ff8a7f" : undefined }}>{over ? "+" + fmt(done - plan) : fmt(left)}</span>
+              </div>
+              <div className="mt8"><Bar value={done} max={plan} /></div>
+            </div>
+          );
+        })}
+      </div>
+    </Section>
   );
 }
