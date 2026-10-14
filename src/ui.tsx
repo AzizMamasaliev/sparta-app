@@ -47,17 +47,7 @@ export function Icon({ name, size = 22, className, style }: { name: keyof typeof
 }
 
 export function Shield({ size = 40 }: { size?: number }) {
-  return (
-    <svg viewBox="0 0 120 120" width={size} height={size} aria-label="SPARTA">
-      <defs>
-        <linearGradient id="spg" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stopColor="#F6DCA6" /><stop offset=".55" stopColor="#D9A85B" /><stop offset="1" stopColor="#9C6B2A" /></linearGradient>
-        <linearGradient id="spr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#E35A47" /><stop offset="1" stopColor="#8E1E16" /></linearGradient>
-      </defs>
-      <path d="M60 6 C80 6 96 18 99 38 C92 30 82 25 72 24 L60 24 L48 24 C38 25 28 30 21 38 C24 18 40 6 60 6 Z" fill="url(#spr)" />
-      <path fill="url(#spg)" fillRule="evenodd" d="M60 22 C80 22 92 36 92 56 L92 80 C92 92 84 102 72 108 L68 110 L68 84 L76 70 L64 70 L62 92 L58 92 L56 70 L44 70 L52 84 L52 110 L48 108 C36 102 28 92 28 80 L28 56 C28 36 40 22 60 22 Z M36 56 L56 56 L56 64 L40 64 C37 64 36 62 36 60 Z M84 56 L64 56 L64 64 L80 64 C83 64 84 62 84 60 Z" />
-      <path d="M32 50 C46 44 74 44 88 50" stroke="#7a5220" strokeWidth="2" fill="none" strokeLinecap="round" opacity=".6" />
-    </svg>
-  );
+  return <img src="./logo.png" width={size} height={size} alt="SPARTA" style={{ display: "block", objectFit: "contain" }} />;
 }
 
 export function TopBar({ title, right, onBack }: { title?: ReactNode; right?: ReactNode; onBack?: () => void }) {
